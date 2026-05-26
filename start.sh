@@ -218,6 +218,62 @@ getSoundbite() {
     (say -v "$VOICE" -r "$RATE" "$MSG" &)
 }
 
+getMaxLen() {
+    local FNAME=$1
+
+    local max=0
+    while read -r line; do
+        local cur_ct=$(( $(echo -n "$line" | wc -m ) ))
+        if [ $cur_ct -gt $max ]; then
+            max=$cur_ct
+        fi
+    done < $FNAME
+
+    echo $max
+}
+
+repeatChar() {
+    local input="$1"
+    local count="$2"
+    printf -v myString '%*s' "$count"
+    printf '%s\n' "${myString// /$input}"
+}
+
+padString() {
+    local S=$1
+    local N=$(( $2 ))
+
+    local cur_ct=$(( $(echo -n "$S" | wc -m) ))
+
+    spaces=$(repeatChar " " $(( N - cur_ct )))
+
+    echo -n "$S $spaces"
+}
+
+attachSeveritiesToLines() {
+    local FNAME=$1
+    local SEVERITIES=$2
+
+    local paddedLength=$(( $(getMaxLen $FNAME) ))
+
+    local line_ix=0
+    local big_str=""
+    while read -r line; do
+        line_ix=$((line_ix + 1))
+        local annotation=$(echo "$SEVERITIES" | jq ".\"$line_ix\"")
+        local padded=$(padString "$line" "$paddedLength")
+        
+        if [ "$annotation" != "null" ]; then
+            big_str="$big_str$padded  // $annotation\n"
+        else
+            big_str="$big_str$padded\n"
+        fi
+    done < $FNAME
+
+    echo -e "$big_str"
+}
+
+
 testFun() {
     FNAME=$1
     rm -f $FNAME
@@ -242,15 +298,19 @@ testFun() {
 
         echo "$userInput" >> $FNAME
 
-        echo "Your file starts here ->"
-        echo ""
-        echo ""
-        bat $FNAME
-        echo ""
-        echo ""
+
 
         lintOutput=$(oxlint --format=json $FNAME)
 
+        annotationsByLine=$(echo "$lintOutput" | jq -r '.diagnostics | map({ (.labels[0].span.line | tostring): .severity }) | add')
+        attachSeveritiesToLines $FNAME "$annotationsByLine" > /tmp/out.ts
+
+        echo "Your file starts here ->"
+        echo ""
+        echo ""
+        bat /tmp/out.ts
+        echo ""
+        echo ""
         # echo "$lintOutput" | jq -r '[.diagnostics[].severity]'
 
         # echo "$lintOutput" | jq -r '[.diagnostics[] | {message, code, causes, severity, labels: .labels[].span.line}]'
@@ -268,6 +328,7 @@ testFun() {
         getFace "$severities"
         echo ""
         echo ""
+
 
         # slowecho "$PROMPT" 0.01
     done
