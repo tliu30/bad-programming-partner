@@ -1,3 +1,5 @@
+#!/bin/bash
+
 testFun() {
     FNAME=$1
     rm -f $FNAME
@@ -31,7 +33,10 @@ testFun() {
         echo "--------------------------------"
         echo ""
 
-        echo "$lintOutput" | jq '.diagnostics[].severity'
+        echo "$lintOutput" | jq -r '[.diagnostics[].severity]'
+
+        # severities=$(echo "$lintOutput" | jq -r '.diagnostics[].severity')
+        # echo "$severities"
     done
     # What do we need to do...
     #
