@@ -262,7 +262,7 @@ attachSeveritiesToLines() {
         line_ix=$((line_ix + 1))
         local annotation=$(echo "$SEVERITIES" | jq ".\"$line_ix\"")
         local padded=$(padString "$line" "$paddedLength")
-        
+
         if [ "$annotation" != "null" ]; then
             big_str="$big_str$padded  // $annotation\n"
         else
@@ -321,7 +321,7 @@ testFun() {
 
         PROMPT=$(getPrompt "$severities")
 
-        getSoundbite "$severities" "$PROMPT"
+        getSoundbite "$severities" "$(echo -e "$PROMPT" | sed 's/\x1b\[[0-9;]*m//g')"
 
         echo ""
         echo ""
