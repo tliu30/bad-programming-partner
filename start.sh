@@ -25,14 +25,17 @@ testFun() {
         echo ""
 
         echo "------- Lint Output ------------"
-        oxlint --format=json $FNAME | python3 -m json.tool
+        # oxlint --format=json $FNAME | python3 -m json.tool
+        oxlint --format=json $FNAME | jq
         echo "--------------------------------"
         echo ""
+
+        oxlint --format=json $FNAME | jq '.diagnostics[].severity'
     done
     # What do we need to do...
     #
     #
-    # you run the command... (maybe with filepath?) and 
+    # you run the command... (maybe with filepath?) and
     # prompt is changed as soon as you run the command
     #
     # then every line you enter gets appended to that file
@@ -46,23 +49,46 @@ testFun() {
     #
     # Enter char - '\x0a'
     # 1Gj
-    # 
-    # 
-    # 
-    # 
-    # 
-    # 
-    # 
-    # 
-    # 
-    # 
-    # 
-    # 
-    # 
-    # 
-    # 
-    # 
-    # 
-    # 
-    # 
+    #
+    # update prompt or say something or add comments or beep/flash
+    # or ALL OF THE ABOVE
+    #
+    #
+    #
+    # export namespace DiagnosticSeverity {
+	# /**
+	#  * Reports an error.
+	#  */
+	# export const Error: 1 = 1;
+	# /**
+	#  * Reports a warning.
+	#  */
+	# export const Warning: 2 = 2;
+	# /**
+	#  * Reports an information.
+	#  */
+	# export const Information: 3 = 3;
+	# /**
+	#  * Reports a hint.
+	#  */
+	# export const Hint: 4 = 4;
+ #    }
+
+ #    export type DiagnosticSeverity = 1 | 2 | 3 | 4;
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
 }
