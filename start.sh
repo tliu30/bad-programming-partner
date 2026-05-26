@@ -120,25 +120,37 @@ getPrompt() {
     FOUND=0
 
     if [ -z "$SEVERITIES" ]; then
-        echo "Let's get coding! "
+        echo -e "\e[32mLet's get coding! \e[0m"
         FOUND=1
     else
         if [ $(echo "$SEVERITIES" | jq .warning) != "null" ]; then
-            ms[0]="\e[33mThere was a warning... watch out buddy! \e[0m"
-            ms[1]="\e[33mBad job! You suck... \e[0m"
+            ms[0]="\e[33mThere was a warning ... watch out buddy! \e[0m"
+            ms[1]="\e[33mBad job! You suck ... \e[0m"
+            ms[2]="\e[33mBe careful there hon ... \e[0m"
+            ms[3]="\e[33mThat's a warning ... you better be careful ...\e[0m"
+            ms[4]="\e[33mWoah ... you better be careful there hotshot!\e[0m"
+            ms[5]="\e[33mTry to write better code please? Please?\e[0m"
 
-            echo ${ms[$(( RANDOM % ${#ms[@]} ))]}
+            echo -e ${ms[$(( RANDOM % ${#ms[@]} ))]}
             FOUND=1
         fi
 
         if [ $(echo "$SEVERITIES" | jq .error) != "null" ]; then
-            echo "\e[31mError?! Try to write better code, fool... \e[0m"
+            ms2[0]="\e[31mError?! Try to write better code, fool ...\e[0m"
+            ms2[1]="\e[31mMaybe ask for a refund from your cs-school?\e[0m"
+            ms2[2]="\e[31mMy two year old can program better than you, idiot!\e[0m"
+            ms2[3]="\e[31mCan you do me a favor and throw me into a big burning fire?\e[0m"
+            echo -e ${ms2[$(( RANDOM % ${#ms2[@]} ))]}
             FOUND=1
         fi
     fi
 
     if [ $FOUND -ne 1 ]; then
-        echo "Let's get coding! "
+        ms3[0]="Let's get coding!"
+        ms3[1]="Let's make some shit!"
+        ms3[2]="Yeah ... make use of my processor(s) ... "
+        echo ${ms3[$(( RANDOM % ${#ms3[@]} ))]}
+        # echo "Let's get coding! "
     fi
 }
 
