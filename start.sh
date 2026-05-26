@@ -37,6 +37,11 @@ testFun() {
 
         echo "$lintOutput" | jq -r '[.diagnostics[] | {message, code, causes, severity, labels: .labels[].span.line}]'
 
+        echo "$lintOutput" | jq -r '[.diagnostics[] | {message, code, causes, severity, labels: .labels[].span.line}]' | jq 'reduce .[] as $diagnostic ({}; .[$diagnostic.severity] += 1)' | jq '.error'
+        echo "$lintOutput" | jq -r '[.diagnostics[] | {message, code, causes, severity, labels: .labels[].span.line}]' | jq 'reduce .[] as $diagnostic ({}; .[$diagnostic.severity] += 1)' | jq '.warning'
+
+
+
         # severities=$(echo "$lintOutput" | jq -r '.diagnostics[].severity')
         # echo "$severities"
     done
