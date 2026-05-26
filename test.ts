@@ -1,2 +1,1 @@
-let a;
-let b;
+// hi
