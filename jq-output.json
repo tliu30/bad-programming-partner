@@ -1,0 +1,29 @@
+{
+  "diagnostics": [
+    {
+      "message": "Variable 'a' is declared but never used. Unused variables should start with a '_'.",
+      "code": "eslint(no-unused-vars)",
+      "severity": "warning",
+      "causes": [],
+      "url": "https://oxc.rs/docs/guide/usage/linter/rules/eslint/no-unused-vars.html",
+      "help": "Consider removing this declaration.",
+      "filename": "test.ts",
+      "labels": [
+        {
+          "label": "'a' is declared here",
+          "span": {
+            "offset": 4,
+            "length": 1,
+            "line": 1,
+            "column": 5
+          }
+        }
+      ],
+      "related": []
+    }
+  ],
+  "number_of_files": 1,
+  "number_of_rules": 95,
+  "threads_count": 12,
+  "start_time": 0.008466584
+}

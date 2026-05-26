@@ -29,11 +29,13 @@ testFun() {
         echo "------- Lint Output ------------"
         # oxlint --format=json $FNAME | python3 -m json.tool
         lintOutput=$(oxlint --format=json $FNAME)
-        echo "$lintOutput" | jq
+        # echo "$lintOutput" | jq
         echo "--------------------------------"
         echo ""
 
-        echo "$lintOutput" | jq -r '[.diagnostics[].severity]'
+        # echo "$lintOutput" | jq -r '[.diagnostics[].severity]'
+
+        echo "$lintOutput" | jq -r '[.diagnostics[] | {message, code, causes, severity, labels: .labels[].span.line}]'
 
         # severities=$(echo "$lintOutput" | jq -r '.diagnostics[].severity')
         # echo "$severities"

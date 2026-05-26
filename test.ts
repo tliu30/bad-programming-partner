@@ -1,1 +1,1 @@
-//a
+let a; let b; 
