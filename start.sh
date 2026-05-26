@@ -101,6 +101,20 @@ fatal=$(cat << 'EOF'
 EOF
 )
 
+slowecho() {
+    IN_STRING=$1
+    RATE=$2
+
+    LEN=${#IN_STRING}
+
+    for ((i = 0; i < LEN; i++)); do
+        echo -n "${IN_STRING:i:1}"
+        sleep $RATE
+    done
+
+    echo -ne "\n"
+}
+
 getPrompt() {
     SEVERITIES=$1
     FOUND=0
@@ -110,7 +124,10 @@ getPrompt() {
         FOUND=1
     else
         if [ $(echo "$SEVERITIES" | jq .warning) != "null" ]; then
-            echo "There was a warning... watch out buddy! "
+            ms[0]="There was a warning... watch out buddy! "
+            ms[1]="Bad job! You suck... "
+
+            echo ${ms[$(( RANDOM % ${#ms[@]} ))]}
             FOUND=1
         fi
 
@@ -125,6 +142,70 @@ getPrompt() {
     fi
 }
 
+getFace() {
+    SEVERITIES=$1
+    FOUND=0
+    FACE=""
+
+    if [ -z "$SEVERITIES" ]; then
+        FACE="$good"
+        FOUND=1
+    else
+        if [ $(echo "$SEVERITIES" | jq .warning) != "null" ]; then
+            FACE="$bad"
+            FOUND=1
+        fi
+
+        if [ $(echo "$SEVERITIES" | jq .error) != "null" ]; then
+            FACE="$fatal"
+            FOUND=1
+        fi
+    fi
+
+    if [ $FOUND -ne 1 ]; then
+        FACE="$good"
+    fi
+
+    slowecho "$FACE" 0.0001
+}
+
+
+getRandomFromArray() {
+    my_array=$1
+    echo ${my_array[$((RANDOM % ${#my_array[@]}))]}
+}
+
+getSoundbite() {
+    SEVERITIES=$1
+    FOUND=0
+    MSG=$2
+
+    if [ -z "$SEVERITIES" ]; then
+        VOICE="Good News"
+        RATE=100
+        FOUND=1
+    else
+        if [ $(echo "$SEVERITIES" | jq .warning) != "null" ]; then
+            VOICE="Bad News"
+            RATE=100
+            FOUND=1
+        fi
+
+        if [ $(echo "$SEVERITIES" | jq .error) != "null" ]; then
+            VOICE="Trinoids"
+            RATE=100
+            FOUND=1
+        fi
+    fi
+
+    if [ $FOUND -ne 1 ]; then
+        VOICE="Good News"
+        RATE=100
+    fi
+
+    (say -v "$VOICE" -r "$RATE" "$MSG" &)
+}
+
 testFun() {
     FNAME=$1
     rm -f $FNAME
@@ -137,7 +218,9 @@ testFun() {
 
     while :
     do
-        IFS= read -rp "$PROMPT" userInput
+        # IFS= read -rp "$PROMPT" userInput
+        slowecho "$PROMPT" 0.01
+        IFS= read -rp ">>> " userInput
 
         clear
 
@@ -150,7 +233,7 @@ testFun() {
         echo "Your file starts here ->"
         echo ""
         echo ""
-        cat $FNAME
+        bat $FNAME
         echo ""
         echo ""
 
@@ -166,6 +249,14 @@ testFun() {
 
         PROMPT=$(getPrompt "$severities")
 
-        # echo "$severities"
+        getSoundbite "$severities" "$PROMPT"
+
+        echo ""
+        echo ""
+        getFace "$severities"
+        echo ""
+        echo ""
+
+        # slowecho "$PROMPT" 0.01
     done
 }
