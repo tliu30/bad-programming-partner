@@ -26,11 +26,12 @@ testFun() {
 
         echo "------- Lint Output ------------"
         # oxlint --format=json $FNAME | python3 -m json.tool
-        oxlint --format=json $FNAME | jq
+        lintOutput=$(oxlint --format=json $FNAME)
+        echo "$lintOutput" | jq
         echo "--------------------------------"
         echo ""
 
-        oxlint --format=json $FNAME | jq '.diagnostics[].severity'
+        echo "$lintOutput" | jq '.diagnostics[].severity'
     done
     # What do we need to do...
     #
