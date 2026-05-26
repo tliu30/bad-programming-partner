@@ -101,6 +101,29 @@ fatal=$(cat << 'EOF'
 EOF
 )
 
+getPrompt() {
+    SEVERITIES=$1
+    FOUND=0
+
+    if [ -z "$SEVERITIES" ]; then
+        echo "Let's get coding! "
+        FOUND=1
+    else
+        if [ $(echo "$SEVERITIES" | jq .warning) != "null" ]; then
+            echo "There was a warning... watch out buddy! "
+            FOUND=1
+        fi
+
+        if [ $(echo "$SEVERITIES" | jq .error) != "null" ]; then
+            echo "Error?! Try to write better code, fool... "
+            FOUND=1
+        fi
+    fi
+
+    if [ $FOUND -ne 1 ]; then
+        echo "Let's get coding! "
+    fi
+}
 
 testFun() {
     FNAME=$1
@@ -109,9 +132,12 @@ testFun() {
     clear
     echo "Your file starts here ->"
     echo ""
+
+    PROMPT=$(getPrompt)
+
     while :
     do
-        IFS= read -rp "Let's get coding! " userInput
+        IFS= read -rp "$PROMPT" userInput
 
         clear
 
@@ -128,82 +154,18 @@ testFun() {
         echo ""
         echo ""
 
-        echo "------- Lint Output ------------"
-        # oxlint --format=json $FNAME | python3 -m json.tool
         lintOutput=$(oxlint --format=json $FNAME)
-        # echo "$lintOutput" | jq
-        echo "--------------------------------"
-        echo ""
 
         # echo "$lintOutput" | jq -r '[.diagnostics[].severity]'
 
-        echo "$lintOutput" | jq -r '[.diagnostics[] | {message, code, causes, severity, labels: .labels[].span.line}]'
+        # echo "$lintOutput" | jq -r '[.diagnostics[] | {message, code, causes, severity, labels: .labels[].span.line}]'
 
-        echo "$good"
+        # echo "$good"
 
-        echo "$lintOutput" | jq -r '[.diagnostics[] | {message, code, causes, severity, labels: .labels[].span.line}]' | jq 'reduce .[] as $diagnostic ({}; .[$diagnostic.severity] += 1)' | jq '.error'
-        echo "$lintOutput" | jq -r '[.diagnostics[] | {message, code, causes, severity, labels: .labels[].span.line}]' | jq 'reduce .[] as $diagnostic ({}; .[$diagnostic.severity] += 1)' | jq '.warning'
+        severities=$(echo "$lintOutput" | jq -r '[.diagnostics[] | {message, code, causes, severity, labels: .labels[].span.line}]' | jq 'reduce .[] as $diagnostic ({}; .[$diagnostic.severity] += 1)')
 
-        # severities=$(echo "$lintOutput" | jq -r '.diagnostics[].severity')
+        PROMPT=$(getPrompt "$severities")
+
         # echo "$severities"
     done
-    # What do we need to do...
-    #
-    #
-    # you run the command... (maybe with filepath?) and
-    # prompt is changed as soon as you run the command
-    #
-    # then every line you enter gets appended to that file
-    #
-    # whenver "enter" is pressed, the contents of the file is echoed, with your
-    # appended line. and the prompt is changed...
-    #
-    # in addition, it gets run through linter / lsp to get warnings
-    #
-    # allow changeline to fix?
-    #
-    # Enter char - '\x0a'
-    # 1Gj
-    #
-    # update prompt or say something or add comments or beep/flash
-    # or ALL OF THE ABOVE
-    #
-    #
-    #
-    # export namespace DiagnosticSeverity {
-	# /**
-	#  * Reports an error.
-	#  */
-	# export const Error: 1 = 1;
-	# /**
-	#  * Reports a warning.
-	#  */
-	# export const Warning: 2 = 2;
-	# /**
-	#  * Reports an information.
-	#  */
-	# export const Information: 3 = 3;
-	# /**
-	#  * Reports a hint.
-	#  */
-	# export const Hint: 4 = 4;
- #    }
-
- #    export type DiagnosticSeverity = 1 | 2 | 3 | 4;
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
 }
