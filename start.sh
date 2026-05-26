@@ -124,21 +124,33 @@ getPrompt() {
         FOUND=1
     else
         if [ $(echo "$SEVERITIES" | jq .warning) != "null" ]; then
-            ms[0]="There was a warning... watch out buddy! "
-            ms[1]="Bad job! You suck... "
+            ms[0]="There was a warning ... watch out buddy! "
+            ms[1]="Bad job! You suck ... "
+            ms[2]="Be careful there hon ... "
+            ms[3]="That's a warning ... you better be careful ..."
+            ms[4]="Woah ... you better be careful there hotshot!"
+            ms[5]="Try to write better code please? Please?"
 
             echo ${ms[$(( RANDOM % ${#ms[@]} ))]}
             FOUND=1
         fi
 
         if [ $(echo "$SEVERITIES" | jq .error) != "null" ]; then
-            echo "Error?! Try to write better code, fool... "
+            ms2[0]="Error?! Try to write better code, fool ..."
+            ms2[1]="Maybe ask for a refund from your cs-school?"
+            ms2[2]="My two year old can program better than you, idiot!"
+            ms2[3]="Can you do me a favor and throw me into a big burning fire?"
+            echo ${ms2[$(( RANDOM % ${#ms2[@]} ))]}
             FOUND=1
         fi
     fi
 
     if [ $FOUND -ne 1 ]; then
-        echo "Let's get coding! "
+        ms3[0]="Let's get coding!"
+        ms3[1]="Let's make some shit!"
+        ms3[2]="Yeah ... make use of my processor(s) ... "
+        echo ${ms3[$(( RANDOM % ${#ms3[@]} ))]}
+        # echo "Let's get coding! "
     fi
 }
 
